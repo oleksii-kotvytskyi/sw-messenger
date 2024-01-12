@@ -2,9 +2,9 @@
   background-color: rgb(40, 38, 48);
   color: white;
   width: 300px;
-  height: 100vh;
   padding: 12px;
   transition: width 0.3s;
+  flex-shrink: 0;
 
   &Narrow {
     transition: width 0.3s;
@@ -39,6 +39,7 @@
     &Toggle {
       color: white !important;
       border: none;
+      scale: 1.2;
 
       &:hover {
         background: rgb(79, 79, 79) !important;

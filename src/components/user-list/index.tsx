@@ -56,7 +56,7 @@ export const UserList = () => {
       </div>
       <div className={s.chatsMain}>
         {users.map((user) => {
-          return <Chat user={user} isOpen={isOpen} />;
+          return <Chat key={user.id} user={user} isOpen={isOpen} />;
         })}
       </div>
     </div>
