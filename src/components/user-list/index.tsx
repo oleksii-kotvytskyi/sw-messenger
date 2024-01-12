@@ -4,7 +4,7 @@ import s from "./style.module.scss";
 import cx from "classnames";
 import { useState } from "react";
 import Input, { SearchProps } from "antd/lib/input";
-import { MenuOutlined } from "@ant-design/icons";
+import { MenuOutlined, MessageOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 const { Search } = Input;
 
