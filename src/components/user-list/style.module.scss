@@ -1,0 +1,50 @@
+.chats {
+  background-color: rgb(40, 38, 48);
+  color: white;
+  width: 300px;
+  height: 100vh;
+  padding: 12px;
+  transition: width 0.3s;
+
+  &Narrow {
+    transition: width 0.3s;
+    width: 80px;
+  }
+
+  &Main {
+    margin-top: 20px;
+  }
+
+  &Chat {
+    margin-top: 2px;
+    height: 60px;
+    color: white !important;
+    width: 100%;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &:hover {
+      background: rgb(79, 79, 79) !important;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-left: 20px;
+
+    &Toggle {
+      color: white !important;
+      border: none;
+
+      &:hover {
+        background: rgb(79, 79, 79) !important;
+      }
+
+      flex-shrink: 0;
+    }
+  }
+}
