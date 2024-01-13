@@ -1,0 +1,11 @@
+.wrapper {
+  backdrop-filter: blur(20px);
+}
+
+.modal {
+  &Body {
+    &Form {
+      margin-top: 24px;
+    }
+  }
+}
