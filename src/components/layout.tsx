@@ -1,6 +1,7 @@
 import { UserList } from "@/components/user-list";
 import { Messages } from "@/components/messages";
-import { SignIn } from "@/components/modals/sign-in";
+
+import { Outlet } from "react-router-dom";
 import s from "./style.module.scss";
 
 export const Layout = () => {
@@ -8,7 +9,7 @@ export const Layout = () => {
     <div className={s.layout}>
       <UserList />
       <Messages />
-      <SignIn />
+      <Outlet />
     </div>
   );
 };

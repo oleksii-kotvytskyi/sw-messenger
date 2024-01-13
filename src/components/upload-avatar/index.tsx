@@ -1,7 +1,6 @@
 import { Modal, Upload, message } from "antd";
 import { useState } from "react";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
-// import s from "./style.module.scss";
 import { getUrlFromFile, imageValidation } from "./helpers";
 
 export const UploadAvatar = () => {
@@ -17,7 +16,7 @@ export const UploadAvatar = () => {
     const isImageValid = await imageValidation(fileUrl);
 
     if (!isImageValid) {
-      message.error("Please provide IMG bigger 400px/400px");
+      message.error("Please provide image bigger 400px/400px");
       return Upload.LIST_IGNORE;
     }
 

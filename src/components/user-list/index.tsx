@@ -1,33 +1,21 @@
-import { IUser } from "@/types";
+import { IUser } from "@/store/types";
 import { Avatar } from "@/components/avatar";
 import s from "./style.module.scss";
 import cx from "classnames";
-import { useState } from "react";
-import Input, { SearchProps } from "antd/lib/input";
-import { MenuOutlined, MessageOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { useMemo, useState } from "react";
+// import  from "antd/lib/input";
+import { MenuOutlined } from "@ant-design/icons";
+import { Button, Input } from "antd";
+import { useAppSelector } from "@/store/hooks";
 const { Search } = Input;
-
-const users: IUser[] = [
-  {
-    firstName: "Oleksii",
-    lastName: "Kot",
-    avatar: null,
-    id: "1",
-    lastMessage: "hello",
-  },
-  { firstName: "Olena", lastName: "Ol", avatar: null, id: "2" },
-];
 
 const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
   return (
-    <Button ghost key={user.id} className={s.chatsChat}>
-      <Avatar firstName={user.firstName} lastName={user.lastName} />
+    <Button ghost key={user.name} className={s.chatsChat}>
+      <Avatar name={user.name} />
       {isOpen && (
         <div>
-          <p>
-            {user.firstName} {user.lastName}
-          </p>
+          <p>{user.name}</p>
           <p>{user.lastMessage}</p>
         </div>
       )}
@@ -37,9 +25,19 @@ const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
 
 export const UserList = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+  const users = useAppSelector((state) => state.users.data);
+  const activeUser = useAppSelector((state) => state.users.activeUser);
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) => user.name?.toLowerCase().includes(searchValue?.toLowerCase())
+      // && activeUser?.name !== user.name
+    );
+  }, [searchValue, users, activeUser?.name]);
 
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
-    console.log(info?.source, value);
+  const onChange = (e) => {
+    setSearchValue(e.target.value);
+  };
 
   return (
     <div className={cx(s.chats, !isOpen && s.chatsNarrow)}>
@@ -52,11 +50,11 @@ export const UserList = () => {
           icon={<MenuOutlined />}
           onClick={() => setIsOpen(!isOpen)}
         />
-        {isOpen && <Search onSearch={onSearch} />}
+        {isOpen && <Search value={searchValue} onChange={onChange} />}
       </div>
       <div className={s.chatsMain}>
         {users.map((user) => {
-          return <Chat key={user.id} user={user} isOpen={isOpen} />;
+          return <Chat key={user.name} user={user} isOpen={isOpen} />;
         })}
       </div>
     </div>

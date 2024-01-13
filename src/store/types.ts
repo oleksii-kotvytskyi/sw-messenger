@@ -1,7 +1,6 @@
 export interface IUser {
-  firstName: string;
-  lastName: string;
+  name: string;
   avatar?: string | null;
-  id: string;
   lastMessage?: string;
+  online: boolean;
 }

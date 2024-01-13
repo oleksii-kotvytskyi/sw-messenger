@@ -2,8 +2,7 @@ import { ReactNode } from "react";
 import s from "./style.module.scss";
 
 type AvatarProps = {
-  firstName: string;
-  lastName: string;
+  name: string;
   avatar?: string;
 };
 
@@ -11,7 +10,7 @@ const AvatarLayout = ({ children }: { children: ReactNode }) => {
   return <div className={s.avatar}>{children}</div>;
 };
 
-export const Avatar = ({ firstName, lastName, avatar }: AvatarProps) => {
+export const Avatar = ({ name, avatar }: AvatarProps) => {
   if (avatar)
     return (
       <AvatarLayout>
@@ -19,7 +18,5 @@ export const Avatar = ({ firstName, lastName, avatar }: AvatarProps) => {
       </AvatarLayout>
     );
 
-  const shortName = `${firstName.slice(0, 1)} ${lastName.slice(0, 1)}`;
-
-  return <AvatarLayout>{shortName}</AvatarLayout>;
+  return <AvatarLayout>{name?.slice(0, 2)}</AvatarLayout>;
 };

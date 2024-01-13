@@ -14,9 +14,9 @@ const Message = ({ message }: { message: string }) => {
 };
 
 export const Messages = () => {
-  const sw = navigator.serviceWorker;
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
+  const sw = navigator.serviceWorker;
 
   useEffect(() => {
     if (sw) {
