@@ -2,12 +2,14 @@ import { Button, Form, Input, Modal, message } from "antd";
 import { useEffect, useState } from "react";
 import { UploadAvatar } from "@/components/upload-avatar";
 import type { RcFile } from "antd/es/upload/interface";
-import { ValidateErrorEntity } from "rc-field-form/es/interface";
+// import { ValidateErrorEntity } from "rc-field-form/es/interface";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import s from "./style.module.scss";
 import XRegExp from "xregexp";
-import { createUser } from "@/store/reducers/users";
+import { signIn, addUserToList } from "@/store/reducers/users";
 import { IUser } from "@/store/types";
+import { stateToServiceWorker } from "@/helpers";
+import { useNavigate } from "react-router-dom";
 
 type FormValues = {
   name: string;
@@ -15,6 +17,7 @@ type FormValues = {
 };
 
 export const SignIn = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
@@ -23,25 +26,12 @@ export const SignIn = () => {
 
   useEffect(() => {
     if (sw) {
-      window.addEventListener("load", () => {
-        sw.register("./users.ts")
-          .then(() => sw.ready)
-          .then(() => {
-            sw.addEventListener("message", ({ data }) => {
-              if (data?.state !== undefined) {
-                dispatch(createUser(data.state));
-              }
-            });
-          });
+      sw.addEventListener("message", ({ data }: { data: IUser | string[] }) => {
+        if (data !== undefined && (data as IUser).name)
+          dispatch(addUserToList(data as IUser));
       });
     }
-  }, [sw, dispatch]);
-
-  const stateToServiceWorker = (data: { state: IUser }) => {
-    if (sw?.controller) {
-      sw.controller.postMessage(data);
-    }
-  };
+  }, [dispatch, sw]);
 
   const onSubmit = (values: FormValues) => {
     if (users.find((user) => user.name === values.name)) {
@@ -50,18 +40,13 @@ export const SignIn = () => {
     }
     const user = { name: values.name, avatar: values.file?.url, online: true };
 
-    dispatch(createUser(user));
-    stateToServiceWorker({
-      state: user,
-    });
+    dispatch(signIn(user));
+    stateToServiceWorker(user);
 
     message.success("User was successfully created");
-
     setIsOpen(false);
-  };
 
-  const onFinishFailed = (errorInfo: ValidateErrorEntity<FormValues>) => {
-    console.log("Failed:", errorInfo);
+    navigate("/app");
   };
 
   return (
@@ -81,7 +66,6 @@ export const SignIn = () => {
         wrapperCol={{ span: 12 }}
         className={s.modalBodyForm}
         onFinish={onSubmit}
-        onFinishFailed={onFinishFailed}
         autoComplete="on"
       >
         <Form.Item

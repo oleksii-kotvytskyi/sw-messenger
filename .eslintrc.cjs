@@ -10,6 +10,8 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh"],
   rules: {
+    // TODO
+    "no-param-reassign": ["error", { props: false }],
     "react-refresh/only-export-components": [
       "warn",
       { allowConstantExport: true },
@@ -25,4 +27,12 @@ module.exports = {
       },
     ],
   },
+  // overrides: [
+  //   {
+  //     // feel free to replace with your preferred file pattern - eg. 'src/**/*Slice.ts'
+  //     files: ["src/**/*.slice.ts"],
+  //     // avoid state param assignment
+  //     rules: { "no-param-reassign": ["error", { props: false }] },
+  //   },
+  // ],
 };

@@ -20,14 +20,22 @@ const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    createUser(state, action: PayloadAction<IUser>) {
-      if (state.data.find((user) => user.name === action.payload.name)) return;
-
-      state.data.push(action.payload);
+    signIn(state, action) {
       state.activeUser = action.payload;
+      sessionStorage.setItem("user", JSON.stringify(action.payload));
+    },
+    addUserToList(state, action: PayloadAction<IUser>) {
+      if (state.data.find((user) => user.name === action.payload.name)) return;
+      state.data.push(action.payload);
 
       sessionStorage.setItem("userList", JSON.stringify(state.data));
-      sessionStorage.setItem("user", JSON.stringify(action.payload));
+    },
+    updateUser(state, action: PayloadAction<IUser>) {
+      let userToUpdate = state.data.find(
+        (user) => user.name === action.payload.name
+      );
+
+      if (userToUpdate) userToUpdate = action.payload;
     },
     removeUser(state, action: PayloadAction<string>) {
       state.data.filter((user) => user.name === action.payload);
@@ -36,6 +44,7 @@ const usersSlice = createSlice({
   },
 });
 
-export const { createUser, removeUser } = usersSlice.actions;
+export const { addUserToList, signIn, removeUser, updateUser } =
+  usersSlice.actions;
 
 export default usersSlice.reducer;

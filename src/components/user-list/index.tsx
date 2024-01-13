@@ -2,16 +2,22 @@ import { IUser } from "@/store/types";
 import { Avatar } from "@/components/avatar";
 import s from "./style.module.scss";
 import cx from "classnames";
-import { useMemo, useState } from "react";
-// import  from "antd/lib/input";
+import { useEffect, useMemo, useState } from "react";
 import { MenuOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useAppSelector } from "@/store/hooks";
+import { updateUser } from "@/store/reducers/users";
+
 const { Search } = Input;
 
 const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
+  useEffect(() => {
+    updateUser({ ...user, online: navigator.onLine });
+  }, [user.name]);
+
   return (
     <Button ghost key={user.name} className={s.chatsChat}>
+      {user.online ? "TRUE" : "FALSE"}
       <Avatar name={user.name} />
       {isOpen && (
         <div>
@@ -27,13 +33,11 @@ export const UserList = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const users = useAppSelector((state) => state.users.data);
-  const activeUser = useAppSelector((state) => state.users.activeUser);
   const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) => user.name?.toLowerCase().includes(searchValue?.toLowerCase())
-      // && activeUser?.name !== user.name
+    return users.filter((user) =>
+      user.name?.toLowerCase().includes(searchValue?.toLowerCase())
     );
-  }, [searchValue, users, activeUser?.name]);
+  }, [searchValue, users]);
 
   const onChange = (e) => {
     setSearchValue(e.target.value);
@@ -53,7 +57,7 @@ export const UserList = () => {
         {isOpen && <Search value={searchValue} onChange={onChange} />}
       </div>
       <div className={s.chatsMain}>
-        {users.map((user) => {
+        {filteredUsers.map((user) => {
           return <Chat key={user.name} user={user} isOpen={isOpen} />;
         })}
       </div>
