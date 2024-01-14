@@ -1,11 +1,38 @@
 .avatar {
-  width: 40px;
-  height: 40px;
-  background-color: red;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(
+    45deg,
+    rgb(193, 191, 232) 0%,
+    rgba(9, 9, 121, 1) 100%
+  );
   color: white;
   border-radius: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+
+  &Parent {
+    position: relative;
+
+    .online {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 10px;
+      width: 10px;
+      border-radius: 100%;
+      border: 1px solid grey;
+
+      &True {
+        background-color: green;
+      }
+
+      &False {
+        background-color: red;
+      }
+    }
+  }
 }
