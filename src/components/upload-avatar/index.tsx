@@ -1,9 +1,11 @@
-import { Modal, Upload, message } from "antd";
+import { Modal, Upload, message, Form } from "antd";
 import { useState } from "react";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
 import { getUrlFromFile, imageValidation } from "./helpers";
 
-export const UploadAvatar = () => {
+export const UploadAvatar = ({ disabled }: { disabled: boolean }) => {
+  const { setFieldValue } = Form.useFormInstance();
+
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -21,6 +23,8 @@ export const UploadAvatar = () => {
     }
 
     file.url = fileUrl;
+
+    setFieldValue("file", file);
     setFileList([file]);
 
     return true;
@@ -31,14 +35,11 @@ export const UploadAvatar = () => {
   return (
     <>
       <Upload
+        disabled={disabled}
+        fileList={fileList}
         listType="picture-card"
-        name="file"
         onRemove={onRemove}
         beforeUpload={beforeUpload}
-        customRequest={({ onSuccess }) => {
-          //  we don't have real API, therefore, the workaround will be to fire a "dummy" fn
-          if (onSuccess) onSuccess("ok");
-        }}
         accept="image/png, image/jpeg, image/svg+xml"
         multiple={false}
         maxCount={1}

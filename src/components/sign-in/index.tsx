@@ -6,8 +6,8 @@ import type { RcFile } from "antd/es/upload/interface";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import s from "./style.module.scss";
 import XRegExp from "xregexp";
-import { signIn, addUserToList } from "@/store/reducers/users";
-import { IUser } from "@/store/types";
+import { signIn, addUserToList, updateUser } from "@/store/reducers/users";
+import { IUser, ServiceMsgType } from "@/store/types";
 import { stateToServiceWorker } from "@/helpers";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,7 @@ type FormValues = {
 export const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
   const [isOpen, setIsOpen] = useState(!activeUser);
@@ -26,22 +27,46 @@ export const SignIn = () => {
 
   useEffect(() => {
     if (sw) {
-      sw.addEventListener("message", ({ data }: { data: IUser | string[] }) => {
-        if (data !== undefined && (data as IUser).name)
-          dispatch(addUserToList(data as IUser));
-      });
+      sw.addEventListener(
+        "message",
+        ({ data }: { data: ServiceMsgType<IUser> }) => {
+          if (data.type === "log-in") dispatch(addUserToList(data.data));
+          if (data.type === "update-user") dispatch(updateUser(data.data));
+        }
+      );
     }
   }, [dispatch, sw]);
 
-  const onSubmit = (values: FormValues) => {
+  const onFinish = async (values: FormValues) => {
+    let fileData: Record<string, string> | undefined = undefined;
+
+    if (values.file) {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("file", values.file);
+      formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET);
+
+      fileData = await fetch(
+        `https://api.cloudinary.com/v1_1/${
+          import.meta.env.VITE_CLOUD_PROJECT
+        }/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      ).then((r) => r.json());
+      setIsLoading(false);
+    }
+
     if (users.find((user) => user.name === values.name)) {
       message.error("User with this name already exist.");
       return;
     }
-    const user = { name: values.name, avatar: values.file?.url, online: true };
+
+    const user = { name: values.name, avatar: fileData?.url, online: true };
 
     dispatch(signIn(user));
-    stateToServiceWorker(user);
+    stateToServiceWorker({ data: user, type: "log-in" });
 
     message.success("User was successfully created");
     setIsOpen(false);
@@ -65,7 +90,7 @@ export const SignIn = () => {
         name="basic"
         wrapperCol={{ span: 12 }}
         className={s.modalBodyForm}
-        onFinish={onSubmit}
+        onFinish={onFinish}
         autoComplete="on"
       >
         <Form.Item
@@ -102,13 +127,13 @@ export const SignIn = () => {
             },
           ]}
         >
-          <Input />
+          <Input disabled={isLoading} />
         </Form.Item>
-        <Form.Item label="Avatar">
-          <UploadAvatar />
+        <Form.Item label="Avatar" name="file">
+          <UploadAvatar disabled={isLoading} />
         </Form.Item>
         <div style={{ textAlign: "right" }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={isLoading}>
             Create
           </Button>
         </div>
