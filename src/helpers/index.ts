@@ -1,8 +1,7 @@
-import { IUser } from "@/store/types";
+import { ServiceMsgType } from "@/store/types";
 
-export const stateToServiceWorker = (data: IUser | string[]) => {
+export const stateToServiceWorker = <T>(data: ServiceMsgType<T>) => {
   const sw = navigator.serviceWorker;
-
   if (sw?.controller) {
     sw.controller.postMessage(data);
   }

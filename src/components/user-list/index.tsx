@@ -2,23 +2,17 @@ import { IUser } from "@/store/types";
 import { Avatar } from "@/components/avatar";
 import s from "./style.module.scss";
 import cx from "classnames";
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { MenuOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useAppSelector } from "@/store/hooks";
-import { updateUser } from "@/store/reducers/users";
 
 const { Search } = Input;
 
 const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
-  useEffect(() => {
-    updateUser({ ...user, online: navigator.onLine });
-  }, [user.name]);
-
   return (
     <Button ghost key={user.name} className={s.chatsChat}>
-      {user.online ? "TRUE" : "FALSE"}
-      <Avatar name={user.name} />
+      <Avatar user={user} />
       {isOpen && (
         <div>
           <p>{user.name}</p>
@@ -33,13 +27,15 @@ export const UserList = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const users = useAppSelector((state) => state.users.data);
+  const activeUser = useAppSelector((state) => state.users.activeUser);
+
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
       user.name?.toLowerCase().includes(searchValue?.toLowerCase())
     );
   }, [searchValue, users]);
 
-  const onChange = (e) => {
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
@@ -54,7 +50,13 @@ export const UserList = () => {
           icon={<MenuOutlined />}
           onClick={() => setIsOpen(!isOpen)}
         />
-        {isOpen && <Search value={searchValue} onChange={onChange} />}
+
+        {isOpen && (
+          <>
+            <Avatar user={activeUser} showOnline={false} />
+            <Search value={searchValue} onChange={onChange} />
+          </>
+        )}
       </div>
       <div className={s.chatsMain}>
         {filteredUsers.map((user) => {

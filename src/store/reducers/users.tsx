@@ -31,11 +31,11 @@ const usersSlice = createSlice({
       sessionStorage.setItem("userList", JSON.stringify(state.data));
     },
     updateUser(state, action: PayloadAction<IUser>) {
-      let userToUpdate = state.data.find(
+      const index = state.data.findIndex(
         (user) => user.name === action.payload.name
       );
 
-      if (userToUpdate) userToUpdate = action.payload;
+      state.data[index] = action.payload;
     },
     removeUser(state, action: PayloadAction<string>) {
       state.data.filter((user) => user.name === action.payload);

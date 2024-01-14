@@ -1,9 +1,9 @@
 import { Card, Typography, Input, Button } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import s from "./style.module.scss";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { stateToServiceWorker } from "@/helpers";
-import { IUser } from "@/store/types";
+import { ServiceMsgType } from "@/store/types";
 
 const { Text } = Typography;
 
@@ -22,15 +22,17 @@ export const Messages = () => {
 
   useEffect(() => {
     if (sw) {
-      sw.addEventListener("message", ({ data }: { data: IUser | string[] }) => {
-        // we send different data via service worker, let's check what kind of data is there to proceed with
-        if (data !== undefined && Array.isArray(data)) setMessages(data);
-      });
+      sw.addEventListener(
+        "message",
+        ({ data }: { data: ServiceMsgType<string[]> }) => {
+          if (data?.type === "send-msg") setMessages(data.data);
+        }
+      );
     }
   }, [setMessages, sw]);
 
   const sendMessage = (msg: string) => {
-    stateToServiceWorker([...messages, msg]);
+    stateToServiceWorker({ data: [...messages, msg], type: "send-msg" });
 
     setMessages([...messages, msg]);
   };
