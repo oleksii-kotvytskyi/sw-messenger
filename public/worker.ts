@@ -5,7 +5,7 @@ self.addEventListener("install", () => {
 self.addEventListener("message", ({ data, source: { id } }) => {
   self.clients.matchAll().then((clients) => {
     clients.forEach((client) => {
-      if (client.id !== id || data.type === "update-user")
+      if (client.id !== id || Boolean(data.shouldBePosted))
         client.postMessage(data);
     });
   });

@@ -1,15 +1,15 @@
 import { Button, Form, Input, Modal, message } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { UploadAvatar } from "@/components/upload-avatar";
 import type { RcFile } from "antd/es/upload/interface";
-// import { ValidateErrorEntity } from "rc-field-form/es/interface";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import s from "./style.module.scss";
 import XRegExp from "xregexp";
-import { signIn, addUserToList, updateUser } from "@/store/reducers/users";
-import { IUser, ServiceMsgType } from "@/store/types";
+import { signIn } from "@/store/reducers/users";
+import { IUser } from "@/store/types";
 import { stateToServiceWorker } from "@/helpers";
 import { useNavigate } from "react-router-dom";
+import { appPath } from "@/pages/urls";
 
 type FormValues = {
   name: string;
@@ -23,19 +23,6 @@ export const SignIn = () => {
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
   const [isOpen, setIsOpen] = useState(!activeUser);
-  const sw = navigator.serviceWorker;
-
-  useEffect(() => {
-    if (sw) {
-      sw.addEventListener(
-        "message",
-        ({ data }: { data: ServiceMsgType<IUser> }) => {
-          if (data.type === "log-in") dispatch(addUserToList(data.data));
-          if (data.type === "update-user") dispatch(updateUser(data.data));
-        }
-      );
-    }
-  }, [dispatch, sw]);
 
   const onFinish = async (values: FormValues) => {
     let fileData: Record<string, string> | undefined = undefined;
@@ -63,7 +50,20 @@ export const SignIn = () => {
       return;
     }
 
-    const user = { name: values.name, avatar: fileData?.url, online: true };
+    const user: IUser = {
+      name: values.name,
+      avatar: fileData?.url,
+      online: true,
+      created: new Date(),
+    };
+
+    if (users.length > 0) {
+      stateToServiceWorker({
+        data: user,
+        type: "create-chat",
+        shouldBePosted: true,
+      });
+    }
 
     dispatch(signIn(user));
     stateToServiceWorker({ data: user, type: "log-in" });
@@ -71,7 +71,7 @@ export const SignIn = () => {
     message.success("User was successfully created");
     setIsOpen(false);
 
-    navigate("/app");
+    navigate(appPath);
   };
 
   return (
