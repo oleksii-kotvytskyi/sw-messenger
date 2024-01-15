@@ -1,22 +1,55 @@
 import { Card, Typography, Input, Button } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import s from "./style.module.scss";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { stateToServiceWorker } from "@/helpers";
-import { ServiceMsgType } from "@/store/types";
+import { checkChat, isUsersHaveChat, stateToServiceWorker } from "@/helpers";
+import { IMessage, ServiceMsgType } from "@/store/types";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { sendMsg } from "@/store/reducers/chats";
+import { Navigate, useParams } from "react-router-dom";
+import { appPath } from "@/pages/urls";
+import cx from "classnames";
 
 const { Text } = Typography;
 
-const Message = ({ message }: { message: string }) => {
+const Message = ({ message }: { message: IMessage }) => {
+  const { chatId } = useParams();
+
   return (
-    <Card className={s.message} bodyStyle={{ padding: "5px" }}>
-      <Text className={s.messageBody}>{message}</Text>
+    <Card
+      className={cx(
+        s.message,
+        chatId === message.from ? s.messageMine : s.messageFrom
+      )}
+      bodyStyle={{ padding: "5px" }}
+    >
+      <Text className={s.messageBody}>{message.message}</Text>
     </Card>
   );
 };
 
 export const Messages = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
+  const chats = useAppSelector((state) => state.chats.data);
+  const activeUser = useAppSelector((state) => state.users.activeUser);
+  const refUser = useRef(activeUser);
+  const { chatId } = useParams();
+
+  useEffect(() => {
+    refUser.current = activeUser;
+  }, [activeUser?.name]);
+
+  const messages = useMemo(() => {
+    if (activeUser?.name && chatId) {
+      return (
+        chats.find((chat) => checkChat(chat.id, activeUser.name, chatId))
+          ?.messages || []
+      );
+    }
+
+    return [];
+  }, [chatId, chats, activeUser?.name]);
+
   const [input, setInput] = useState("");
   const sw = navigator.serviceWorker;
 
@@ -24,36 +57,55 @@ export const Messages = () => {
     if (sw) {
       sw.addEventListener(
         "message",
-        ({ data }: { data: ServiceMsgType<string[]> }) => {
-          if (data?.type === "send-msg") setMessages(data.data);
+        ({ data }: { data: ServiceMsgType<IMessage> }) => {
+          if (data?.type === "send-msg") dispatch(sendMsg(data.data));
         }
       );
     }
-  }, [setMessages, sw]);
+  }, [dispatch, sw]);
 
-  const sendMessage = (msg: string) => {
-    stateToServiceWorker({ data: [...messages, msg], type: "send-msg" });
+  const pressSend = (msg: string) => {
+    if (activeUser?.name && chatId) {
+      // const chatMsgId = chatId + activeUser?.name;
 
-    setMessages([...messages, msg]);
+      const message: IMessage = {
+        timestamp: new Date(),
+        message: msg,
+        from: activeUser?.name,
+        to: chatId,
+      };
+
+      // console.log(checkChat(chatMsgId, activeUser.name, chatId));
+
+      stateToServiceWorker({
+        data: message,
+        type: "send-msg",
+      });
+      dispatch(sendMsg(message));
+    }
   };
 
   const handleSend = () => {
     if (input) {
-      sendMessage(input);
+      pressSend(input);
       setInput("");
     }
   };
 
+  if (!isUsersHaveChat(chats, activeUser?.name || "", chatId || "") && chatId) {
+    return <Navigate to={appPath} />;
+  }
+
   return (
     <div className={s.messages}>
-      {messages.length > 0 ? (
+      {messages?.length > 0 ? (
         <div className={s.list}>
-          {messages.map((message, i) => {
-            return <Message message={message} key={i} />;
+          {messages.map((msg, i) => {
+            return <Message message={msg} key={i} />;
           })}
         </div>
       ) : (
-        <div>No messages were send yet</div>
+        <div>No messages were sent yet</div>
       )}
 
       <div className={s.messagesAction}>
@@ -79,12 +131,3 @@ export const Messages = () => {
     </div>
   );
 };
-
-// const messages = [
-//   {
-//     time: new Date(),
-//     from: "Oleksii",
-//     to: "Olena",
-//     message: "Hola!",
-//   },
-// ];
