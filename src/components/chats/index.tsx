@@ -4,14 +4,22 @@ import s from "./style.module.scss";
 import cx from "classnames";
 import { ChangeEvent, useMemo, useState } from "react";
 import { MenuOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
+import { Button, Input, Tooltip } from "antd";
 import { useAppSelector } from "@/store/hooks";
+import { useNavigate } from "react-router-dom";
+import { chatPath } from "@/pages/urls";
 
 const { Search } = Input;
 
 const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
+  const navigate = useNavigate();
   return (
-    <Button ghost key={user.name} className={s.chatsChat}>
+    <Button
+      ghost
+      key={user.name}
+      className={s.chatsChat}
+      onClick={() => navigate(chatPath(user.name))}
+    >
       <Avatar user={user} />
       {isOpen && (
         <div>
@@ -23,7 +31,7 @@ const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
   );
 };
 
-export const UserList = () => {
+export const Chats = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const users = useAppSelector((state) => state.users.data);
@@ -53,7 +61,15 @@ export const UserList = () => {
 
         {isOpen && (
           <>
-            <Avatar user={activeUser} showOnline={false} />
+            <Tooltip
+              mouseEnterDelay={0.5}
+              color="geekblue"
+              title={<div>Me: {activeUser?.name}</div>}
+            >
+              <div>
+                <Avatar user={activeUser} showOnline={false} />
+              </div>
+            </Tooltip>
             <Search value={searchValue} onChange={onChange} />
           </>
         )}
