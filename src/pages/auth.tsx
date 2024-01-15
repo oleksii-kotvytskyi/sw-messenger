@@ -1,18 +1,41 @@
-import { useAppSelector } from "@/store/hooks";
-import { useNavigate, Outlet } from "react-router-dom";
-import { appPath, signInPath } from "@/pages/urls";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
+import { appPath, signInPath, basePath } from "@/pages/urls";
 import { useEffect, useRef } from "react";
-import { stateToServiceWorker } from "@/helpers";
+import { isUsersDoNotHaveChat, stateToServiceWorker } from "@/helpers";
+import { IUser, ServiceMsgType } from "@/store/types";
+import { addUserToList, updateUser } from "@/store/reducers/users";
+import { createChat } from "@/store/reducers/chats";
 
 export const Auth = () => {
   const activeUser = useAppSelector((state) => state.users.activeUser);
+  const users = useAppSelector((state) => state.users.data);
+  const chats = useAppSelector((state) => state.chats.data);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  // refs need to get values from hooks and do side effects
   const refUser = useRef(activeUser);
+  const refUsers = useRef(users);
+  const refChats = useRef(chats);
   const sw = navigator.serviceWorker;
+
+  // const warningHandler = (e: BeforeUnloadEvent) => {
+  //   e.preventDefault();
+  //   return "Your data will be lost!";
+  // };
+
+  useEffect(() => {
+    refUsers.current = users;
+  }, [users]);
+
+  useEffect(() => {
+    refChats.current = chats;
+  }, [chats]);
 
   useEffect(() => {
     refUser.current = activeUser;
-  }, [activeUser?.name]);
+  }, [activeUser]);
 
   // register service worker
   // TODO is it need to check if worker already registered or not ?
@@ -25,36 +48,76 @@ export const Auth = () => {
   }, [sw]);
 
   useEffect(() => {
+    if (sw) {
+      sw.addEventListener(
+        "message",
+        ({ data }: { data: ServiceMsgType<IUser> }) => {
+          if (data.type === "log-in") dispatch(addUserToList(data.data));
+          if (data.type === "update-user") dispatch(updateUser(data.data));
+          if (data.type === "create-chat") {
+            const dataName = data.data.name;
+            const activeUserName = refUser?.current?.name;
+            const actualChats = refChats?.current;
+            const actualUsers = refUsers?.current;
+
+            // create chat for users were logged in the start
+            if (activeUserName !== dataName) {
+              const chatId = activeUserName + dataName;
+              dispatch(createChat(chatId));
+            }
+
+            // create chats for user which was logged in the last
+            if (actualUsers?.length > 0 && activeUserName === dataName) {
+              actualUsers.forEach((user) => {
+                if (isUsersDoNotHaveChat(actualChats, user.name, dataName)) {
+                  const chatId = user.name + dataName;
+                  dispatch(createChat(chatId));
+                }
+              });
+            }
+          }
+        }
+      );
+    }
+  }, [dispatch, sw]);
+
+  useEffect(() => {
     const visibilityHandler = () => {
       const userOn = { ...refUser?.current, online: true };
       const userOff = { ...refUser?.current, online: false };
 
       if (document.hidden) {
-        stateToServiceWorker({ data: userOff, type: "update-user" });
-      } else stateToServiceWorker({ data: userOn, type: "update-user" });
-    };
-
-    const warningHandler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      return "Your data will be lost!";
+        stateToServiceWorker({
+          data: userOff,
+          type: "update-user",
+          shouldBePosted: true,
+        });
+      } else
+        stateToServiceWorker({
+          data: userOn,
+          type: "update-user",
+          shouldBePosted: true,
+        });
     };
 
     if (sw) {
       document.addEventListener("visibilitychange", visibilityHandler);
-      window.addEventListener("beforeunload", warningHandler);
+      // window.addEventListener("beforeunload", warningHandler);
     }
 
     return () => {
       if (sw)
         document.removeEventListener("visibilitychange", visibilityHandler);
-      window.removeEventListener("beforeunload", warningHandler);
+      // window.removeEventListener("beforeunload", warningHandler);
     };
   }, [sw]);
 
   useEffect(() => {
     if (!activeUser) navigate(signInPath);
-    else navigate(appPath);
-  }, [activeUser, navigate]);
+    if (location.pathname === basePath) navigate(appPath);
+  }, [activeUser, navigate, location.pathname]);
+
+  if (!activeUser && location.pathname !== signInPath) return null;
 
   return <Outlet />;
 };
