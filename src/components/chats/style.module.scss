@@ -6,6 +6,16 @@
   transition: width 0.3s;
   flex-shrink: 0;
 
+  .item {
+    transition: transform 0.3s;
+    transform: translateX(0);
+
+    &Hidden {
+      transform: translateX(-300px);
+      transition: transform 0.3s;
+    }
+  }
+
   &Narrow {
     transition: width 0.3s;
     width: 80px;
@@ -32,9 +42,14 @@
 
   .actions {
     display: flex;
-    justify-content: space-between;
     gap: 12px;
     padding-left: 20px;
+
+    &Second {
+      display: flex;
+      gap: 12px;
+      overflow: hidden;
+    }
 
     &Toggle {
       color: white !important;

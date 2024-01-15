@@ -9,6 +9,7 @@ import { sendMsg } from "@/store/reducers/chats";
 import { Navigate, useParams } from "react-router-dom";
 import { appPath } from "@/pages/urls";
 import cx from "classnames";
+import BgPattern from "@/assets/pattern.svg";
 
 const { Text } = Typography;
 
@@ -37,7 +38,7 @@ export const Messages = () => {
 
   useEffect(() => {
     refUser.current = activeUser;
-  }, [activeUser?.name]);
+  }, [activeUser]);
 
   const messages = useMemo(() => {
     if (activeUser?.name && chatId) {
@@ -96,8 +97,16 @@ export const Messages = () => {
     return <Navigate to={appPath} />;
   }
 
+  if (!chatId)
+    return (
+      <div
+        className={s.messages}
+        style={{ background: `url('${BgPattern}')` }}
+      />
+    );
+
   return (
-    <div className={s.messages}>
+    <div className={s.messages} style={{ background: `url('${BgPattern}')` }}>
       {messages?.length > 0 ? (
         <div className={s.list}>
           {messages.map((msg, i) => {
@@ -121,9 +130,13 @@ export const Messages = () => {
           size="large"
           onClick={handleSend}
           disabled={!input}
+          style={{ backgroundColor: "#212121" }}
           icon={
             <ArrowRightOutlined
-              style={{ scale: "1.2", color: !input ? "white" : "inherit" }}
+              style={{
+                scale: "1.2",
+                color: !input ? "white" : "inherit",
+              }}
             />
           }
         />

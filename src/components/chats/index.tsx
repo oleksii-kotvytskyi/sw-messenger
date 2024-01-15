@@ -59,20 +59,22 @@ export const Chats = () => {
           onClick={() => setIsOpen(!isOpen)}
         />
 
-        {isOpen && (
-          <>
-            <Tooltip
-              mouseEnterDelay={0.5}
-              color="geekblue"
-              title={<div>Me: {activeUser?.name}</div>}
-            >
-              <div>
-                <Avatar user={activeUser} showOnline={false} />
-              </div>
-            </Tooltip>
-            <Search value={searchValue} onChange={onChange} />
-          </>
-        )}
+        <div className={s.actionsSecond}>
+          <Tooltip
+            mouseEnterDelay={0.5}
+            color="geekblue"
+            title={<div>Me: {activeUser?.name}</div>}
+          >
+            <div className={cx(s.item, !isOpen && s.itemHidden)}>
+              <Avatar user={activeUser} showOnline={false} />
+            </div>
+          </Tooltip>
+          <Search
+            className={cx(s.item, !isOpen && s.itemHidden)}
+            value={searchValue}
+            onChange={onChange}
+          />
+        </div>
       </div>
       <div className={s.chatsMain}>
         {filteredUsers.map((user) => {

@@ -28,13 +28,11 @@ const AvatarLayout = ({
 };
 
 export const Avatar = ({ user, showOnline = true }: AvatarProps) => {
-  const value =
-    "http://res.cloudinary.com/dujqsp4s5/image/upload/v1705258350/jjl6c33xyb5qunr7px7r.png";
-  if (user?.avatar || value)
+  if (user?.avatar)
     return (
       <AvatarLayout user={user} showOnline={showOnline}>
         <img
-          src={user?.avatar || value}
+          src={user?.avatar}
           alt={`Avatar ${user?.name}`}
           style={{ width: "100%", height: "100%" }}
         />

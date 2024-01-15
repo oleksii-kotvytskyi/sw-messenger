@@ -51,31 +51,41 @@ export const Auth = () => {
     if (sw) {
       sw.addEventListener(
         "message",
-        ({ data }: { data: ServiceMsgType<IUser> }) => {
-          if (data.type === "log-in") dispatch(addUserToList(data.data));
-          if (data.type === "update-user") dispatch(updateUser(data.data));
-          if (data.type === "create-chat") {
+        ({ data }: MessageEvent<ServiceMsgType<IUser>>) => {
+          if (data.type === "log-in") {
             const dataName = data.data.name;
             const activeUserName = refUser?.current?.name;
             const actualChats = refChats?.current;
             const actualUsers = refUsers?.current;
 
-            // create chat for users were logged in the start
-            if (activeUserName !== dataName) {
-              const chatId = activeUserName + dataName;
-              dispatch(createChat(chatId));
-            }
+            if (activeUserName !== data.data.name)
+              dispatch(addUserToList(data.data));
 
-            // create chats for user which was logged in the last
-            if (actualUsers?.length > 0 && activeUserName === dataName) {
-              actualUsers.forEach((user) => {
+            const createChatsFn = () => {
+              actualUsers?.forEach((user) => {
                 if (isUsersDoNotHaveChat(actualChats, user.name, dataName)) {
                   const chatId = user.name + dataName;
                   dispatch(createChat(chatId));
                 }
               });
+            };
+
+            // create chats for users were logged-in
+            if (activeUserName && dataName && activeUserName === dataName) {
+              createChatsFn();
+            }
+            // create chats for user which was just created
+            if (!activeUserName) {
+              createChatsFn();
+            }
+
+            // create chat for users were logged in the start
+            if (activeUserName && activeUserName !== dataName) {
+              const chatId = activeUserName + dataName;
+              dispatch(createChat(chatId));
             }
           }
+          if (data.type === "update-user") dispatch(updateUser(data.data));
         }
       );
     }

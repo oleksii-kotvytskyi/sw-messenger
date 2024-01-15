@@ -8,7 +8,7 @@ import XRegExp from "xregexp";
 import { signIn } from "@/store/reducers/users";
 import { IUser } from "@/store/types";
 import { stateToServiceWorker } from "@/helpers";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { appPath } from "@/pages/urls";
 
 type FormValues = {
@@ -23,6 +23,8 @@ export const SignIn = () => {
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
   const [isOpen, setIsOpen] = useState(!activeUser);
+
+  if (activeUser) return <Navigate to={appPath} />;
 
   const onFinish = async (values: FormValues) => {
     let fileData: Record<string, string> | undefined = undefined;
@@ -57,16 +59,12 @@ export const SignIn = () => {
       created: new Date(),
     };
 
-    if (users.length > 0) {
-      stateToServiceWorker({
-        data: user,
-        type: "create-chat",
-        shouldBePosted: true,
-      });
-    }
-
     dispatch(signIn(user));
-    stateToServiceWorker({ data: user, type: "log-in" });
+    stateToServiceWorker({
+      data: user,
+      type: "log-in",
+      shouldBePosted: true,
+    });
 
     message.success("User was successfully created");
     setIsOpen(false);
