@@ -1,15 +1,13 @@
-import { UserList } from "@/components/user-list";
+import { Chats } from "@/components/chats";
 import { Messages } from "@/components/messages";
 
-import { Outlet, useNavigate } from "react-router-dom";
 import s from "./style.module.scss";
 
 export const Layout = () => {
   return (
     <div className={s.layout}>
-      <UserList />
+      <Chats />
       <Messages />
-      <Outlet />
     </div>
   );
 };
