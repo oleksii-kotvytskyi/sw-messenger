@@ -98,6 +98,7 @@ export const SignIn = () => {
             {
               required: true,
               validator(_rule, value: string) {
+                // @ts-ignore
                 const regExp = new XRegExp("^[\\p{L}0-9_]+$") as RegExp;
                 // check characters in all languages
                 // more info https://stackoverflow.com/questions/150033/regular-expression-to-match-non-ascii-characters/873600#873600 and https://xregexp.com/api/

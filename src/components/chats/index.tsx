@@ -3,11 +3,7 @@ import { Avatar } from "@/components/avatar";
 import s from "./style.module.scss";
 import cx from "classnames";
 import { ChangeEvent, useMemo, useState } from "react";
-import {
-  ArrowLeftOutlined,
-  LeftCircleFilled,
-  MenuOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, MenuOutlined } from "@ant-design/icons";
 import { Button, Input, Tooltip } from "antd";
 import { useAppSelector } from "@/store/hooks";
 import { useNavigate, useParams } from "react-router-dom";
