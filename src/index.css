@@ -5,6 +5,7 @@
 
   color: white;
   background-color: #065a63;
+  box-sizing: border-box;
 }
 
 a {

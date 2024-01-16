@@ -6,17 +6,20 @@ import { IUser } from "@/store/types";
 type AvatarProps = {
   user: IUser | null;
   showOnline?: boolean;
+  wrapperClassName?: string;
 };
 
 const AvatarLayout = ({
   user,
   children,
   showOnline,
+  className,
 }: AvatarProps & {
   children: ReactNode;
+  className?: string;
 }) => {
   return (
-    <div className={s.avatarParent}>
+    <div className={cx(s.avatarParent, className)}>
       <div className={s.avatar}>{children}</div>
       {showOnline && (
         <div
@@ -27,10 +30,18 @@ const AvatarLayout = ({
   );
 };
 
-export const Avatar = ({ user, showOnline = true }: AvatarProps) => {
+export const Avatar = ({
+  user,
+  showOnline = true,
+  wrapperClassName,
+}: AvatarProps) => {
   if (user?.avatar)
     return (
-      <AvatarLayout user={user} showOnline={showOnline}>
+      <AvatarLayout
+        user={user}
+        showOnline={showOnline}
+        className={wrapperClassName}
+      >
         <img
           src={user?.avatar}
           alt={`Avatar ${user?.name}`}
@@ -40,7 +51,11 @@ export const Avatar = ({ user, showOnline = true }: AvatarProps) => {
     );
 
   return (
-    <AvatarLayout user={user} showOnline={showOnline}>
+    <AvatarLayout
+      user={user}
+      showOnline={showOnline}
+      className={wrapperClassName}
+    >
       {user?.name?.slice(0, 2)}
     </AvatarLayout>
   );

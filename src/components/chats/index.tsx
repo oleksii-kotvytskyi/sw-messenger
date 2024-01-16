@@ -3,11 +3,15 @@ import { Avatar } from "@/components/avatar";
 import s from "./style.module.scss";
 import cx from "classnames";
 import { ChangeEvent, useMemo, useState } from "react";
-import { MenuOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  LeftCircleFilled,
+  MenuOutlined,
+} from "@ant-design/icons";
 import { Button, Input, Tooltip } from "antd";
 import { useAppSelector } from "@/store/hooks";
-import { useNavigate } from "react-router-dom";
-import { chatPath } from "@/pages/urls";
+import { useNavigate, useParams } from "react-router-dom";
+import { appPath, chatPath } from "@/pages/urls";
 import { useView } from "@/helpers/hooks";
 
 const { Search } = Input;
@@ -21,23 +25,24 @@ const Chat = ({ user, isOpen }: { user: IUser; isOpen: boolean }) => {
       className={s.chatsChat}
       onClick={() => navigate(chatPath(user.name))}
     >
-      <Avatar user={user} />
-      {isOpen && (
-        <div>
-          <p>{user.name}</p>
-          <p>{user.lastMessage}</p>
-        </div>
-      )}
+      <Avatar user={user} wrapperClassName={s.chatsChatAvatar} />
+
+      <div className={cx(s.chatsChatName, !isOpen && s.chatsChatNameHidden)}>
+        <p>{user.name}</p>
+        <p>{user.lastMessage}</p>
+      </div>
     </Button>
   );
 };
 
 export const Chats = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
-  // const { isMobile } = useView();
+  const { isMobile } = useView();
+  const { chatId } = useParams();
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
@@ -50,7 +55,13 @@ export const Chats = () => {
   };
 
   return (
-    <div className={cx(s.chats, !isOpen && s.chatsNarrow)}>
+    <div
+      className={cx(
+        s.chats,
+        !isOpen && s.chatsNarrow,
+        isMobile && chatId && s.chatsHidden
+      )}
+    >
       <div className={s.actions}>
         <Button
           ghost
@@ -62,20 +73,33 @@ export const Chats = () => {
         />
 
         <div className={s.actionsMain}>
-          <Tooltip
-            mouseEnterDelay={0.5}
-            color="geekblue"
-            title={<div>Me: {activeUser?.name}</div>}
-          >
-            <div className={cx(s.item, !isOpen && s.itemHidden)}>
-              <Avatar user={activeUser} showOnline={false} />
-            </div>
-          </Tooltip>
-          <Search
-            className={cx(s.item, !isOpen && s.itemHidden)}
-            value={searchValue}
-            onChange={onChange}
-          />
+          {chatId && isMobile ? (
+            <Button
+              ghost
+              type="text"
+              shape="circle"
+              style={{ color: "white ", borderColor: "white" }}
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(appPath)}
+            />
+          ) : (
+            <>
+              <Tooltip
+                mouseEnterDelay={0.5}
+                color="geekblue"
+                title={<div>Me: {activeUser?.name}</div>}
+              >
+                <div className={cx(s.item, !isOpen && s.itemHidden)}>
+                  <Avatar user={activeUser} showOnline={false} />
+                </div>
+              </Tooltip>
+              <Search
+                className={cx(s.item, !isOpen && s.itemHidden)}
+                value={searchValue}
+                onChange={onChange}
+              />
+            </>
+          )}
         </div>
       </div>
       <div className={s.chatsMain}>
