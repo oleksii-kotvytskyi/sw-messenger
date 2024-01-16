@@ -16,6 +16,7 @@
     "@ant-design/icons": "^5.2.6",
     "@reduxjs/toolkit": "^2.0.1",
     "antd": "^5.12.8",
+    "esbuild": "^0.19.11",
     "gh-pages": "^6.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -39,6 +40,7 @@
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "register-service-worker": "^1.7.2",
     "sass": "^1.69.7",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"

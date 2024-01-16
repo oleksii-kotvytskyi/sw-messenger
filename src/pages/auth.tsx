@@ -37,16 +37,6 @@ export const Auth = () => {
     refUser.current = activeUser;
   }, [activeUser]);
 
-  // register service worker
-  // TODO is it need to check if worker already registered or not ?
-  useEffect(() => {
-    if (sw) {
-      window.addEventListener("load", () => {
-        sw.register("./worker.ts").then(() => sw.ready);
-      });
-    }
-  }, [sw]);
-
   useEffect(() => {
     if (sw) {
       sw.addEventListener(

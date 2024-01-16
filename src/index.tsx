@@ -12,6 +12,7 @@ import { Auth } from "@/pages/auth";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import "./index.css";
+import { register } from "register-service-worker";
 
 const container = document.getElementById("root") as HTMLElement;
 
@@ -27,7 +28,7 @@ const router = createBrowserRouter(
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
   ),
-  { basename: "/sw-messenger" }
+  { basename: "/sw-messenger/" }
 );
 
 export const RootApplication = () => {
@@ -41,3 +42,5 @@ export const RootApplication = () => {
 const root = createRoot(container);
 
 root.render(<RootApplication />);
+
+register(`/worker.ts`);
