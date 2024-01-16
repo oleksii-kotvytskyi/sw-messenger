@@ -12,7 +12,7 @@ import { Auth } from "@/pages/auth";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import "./index.css";
-import { register } from "register-service-worker";
+import { useEffect } from "react";
 
 const container = document.getElementById("root") as HTMLElement;
 
@@ -32,6 +32,28 @@ const router = createBrowserRouter(
 );
 
 export const RootApplication = () => {
+  const sw = navigator.serviceWorker;
+
+  useEffect(() => {
+    let registration: ServiceWorkerRegistration | null = null;
+    if (sw) {
+      window.addEventListener("load", () => {
+        sw.register(`${import.meta.env.VITE_BASE_URL}/worker.js`).then(
+          (reg) => {
+            registration = reg;
+            return sw.ready;
+          }
+        );
+      });
+    }
+
+    return () => {
+      if (sw && registration) {
+        registration.unregister();
+      }
+    };
+  }, [sw]);
+
   return (
     <Provider store={store}>
       <RouterProvider router={router} />
@@ -42,5 +64,3 @@ export const RootApplication = () => {
 const root = createRoot(container);
 
 root.render(<RootApplication />);
-
-register(`/worker.ts`);

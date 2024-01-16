@@ -86,18 +86,20 @@ export const Auth = () => {
       const userOn = { ...refUser?.current, online: true };
       const userOff = { ...refUser?.current, online: false };
 
-      if (document.hidden) {
-        stateToServiceWorker({
-          data: userOff,
-          type: "update-user",
-          shouldBePosted: true,
-        });
-      } else
-        stateToServiceWorker({
-          data: userOn,
-          type: "update-user",
-          shouldBePosted: true,
-        });
+      if (refUser.current) {
+        if (document.hidden) {
+          stateToServiceWorker({
+            data: userOff,
+            type: "update-user",
+            shouldBePosted: true,
+          });
+        } else
+          stateToServiceWorker({
+            data: userOn,
+            type: "update-user",
+            shouldBePosted: true,
+          });
+      }
     };
 
     if (sw) {
