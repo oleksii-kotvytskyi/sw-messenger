@@ -1,12 +1,1 @@
-self.addEventListener("install", () => {
-  self.skipWaiting();
-});
-
-self.addEventListener("message", ({ data, source: { id } }) => {
-  self.clients.matchAll().then((clients) => {
-    clients.forEach((client) => {
-      if (client.id !== id || Boolean(data.shouldBePosted))
-        client.postMessage(data);
-    });
-  });
-});
+"use strict";(()=>{self.addEventListener("install",()=>{self.skipWaiting()});self.addEventListener("message",({data:e,source:{id:l}})=>{self.clients.matchAll().then(t=>{t.forEach(s=>{(s.id!==l||e.shouldBePosted)&&s.postMessage(e)})})});})();
