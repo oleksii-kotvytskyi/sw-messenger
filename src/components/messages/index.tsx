@@ -2,7 +2,12 @@ import { Card, Typography, Input, Button } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import s from "./style.module.scss";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { checkChat, isUsersHaveChat, stateToServiceWorker } from "@/helpers";
+import {
+  checkChat,
+  isUsersHaveChat,
+  scrollToBottomList,
+  stateToServiceWorker,
+} from "@/helpers";
 import { IMessage, ServiceMsgType } from "@/store/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { sendMsg } from "@/store/reducers/chats";
@@ -59,7 +64,10 @@ export const Messages = () => {
       sw.addEventListener(
         "message",
         ({ data }: { data: ServiceMsgType<IMessage> }) => {
-          if (data?.type === "send-msg") dispatch(sendMsg(data.data));
+          if (data?.type === "send-msg") {
+            dispatch(sendMsg(data.data));
+            scrollToBottomList();
+          }
         }
       );
     }
@@ -83,6 +91,7 @@ export const Messages = () => {
         type: "send-msg",
       });
       dispatch(sendMsg(message));
+      scrollToBottomList();
     }
   };
 
@@ -97,6 +106,13 @@ export const Messages = () => {
     return <Navigate to={appPath} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (chatId) {
+      scrollToBottomList();
+    }
+  }, [chatId]);
+
   if (!chatId)
     return (
       <div
@@ -108,7 +124,7 @@ export const Messages = () => {
   return (
     <div className={s.messages} style={{ background: `url('${BgPattern}')` }}>
       {messages?.length > 0 ? (
-        <div className={s.list}>
+        <div className={s.list} id="message-list">
           {messages.map((msg, i) => {
             return <Message message={msg} key={i} />;
           })}
@@ -130,7 +146,7 @@ export const Messages = () => {
           size="large"
           onClick={handleSend}
           disabled={!input}
-          style={{ backgroundColor: "#212121" }}
+          style={{ backgroundColor: "#282630", color: "white" }}
           icon={
             <ArrowRightOutlined
               style={{

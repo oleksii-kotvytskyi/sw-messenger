@@ -40,3 +40,14 @@ export const checkChat = (
 ) => {
   return chatId.includes(userName1) && chatId.includes(userName2);
 };
+
+export const scrollToBottomList = () => {
+  const list = document.getElementById("message-list");
+
+  if (list) {
+    // scroll to bottom when send a msg
+    setTimeout(() => {
+      list.scrollTop = list.scrollHeight;
+    }, 0);
+  }
+};

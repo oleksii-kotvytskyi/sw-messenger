@@ -39,5 +39,9 @@ export const Avatar = ({ user, showOnline = true }: AvatarProps) => {
       </AvatarLayout>
     );
 
-  return <AvatarLayout user={user}>{user?.name?.slice(0, 2)}</AvatarLayout>;
+  return (
+    <AvatarLayout user={user} showOnline={showOnline}>
+      {user?.name?.slice(0, 2)}
+    </AvatarLayout>
+  );
 };

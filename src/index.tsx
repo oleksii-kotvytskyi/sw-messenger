@@ -6,7 +6,7 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import { Layout } from "@/components/layout";
+import { Compound } from "@/components/compound";
 import { SignIn } from "@/components/sign-in";
 import { Auth } from "@/pages/auth";
 import { Provider } from "react-redux";
@@ -20,8 +20,8 @@ const router = createBrowserRouter(
     <Route path="/" element={<Auth />}>
       <Route path="sign-in" element={<SignIn />} />
       <Route path="app/*">
-        <Route index element={<Layout />} />
-        <Route path=":chatId" element={<Layout />} />
+        <Route index element={<Compound />} />
+        <Route path=":chatId" element={<Compound />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
