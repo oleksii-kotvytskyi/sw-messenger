@@ -7,7 +7,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/sw-messenger/",
+  base: "/sw-messenger",
   plugins: [
     react(),
     {

@@ -28,7 +28,7 @@ const router = createBrowserRouter(
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
   ),
-  { basename: "/sw-messenger/" }
+  { basename: "/sw-messenger" }
 );
 
 export const RootApplication = () => {
