@@ -1,6 +1,6 @@
 .messages {
   background-color: #138996;
-  width: 100%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   padding: 16px 32px 0 32px;
@@ -45,5 +45,11 @@
     &Body {
       font-size: large;
     }
+  }
+}
+
+@media (max-width: 600px) {
+  .messages {
+    // display: none;
   }
 }

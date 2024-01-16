@@ -8,6 +8,7 @@ import { Button, Input, Tooltip } from "antd";
 import { useAppSelector } from "@/store/hooks";
 import { useNavigate } from "react-router-dom";
 import { chatPath } from "@/pages/urls";
+import { useView } from "@/helpers/hooks";
 
 const { Search } = Input;
 
@@ -36,6 +37,7 @@ export const Chats = () => {
   const [searchValue, setSearchValue] = useState("");
   const users = useAppSelector((state) => state.users.data);
   const activeUser = useAppSelector((state) => state.users.activeUser);
+  // const { isMobile } = useView();
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
@@ -59,7 +61,7 @@ export const Chats = () => {
           onClick={() => setIsOpen(!isOpen)}
         />
 
-        <div className={s.actionsSecond}>
+        <div className={s.actionsMain}>
           <Tooltip
             mouseEnterDelay={0.5}
             color="geekblue"

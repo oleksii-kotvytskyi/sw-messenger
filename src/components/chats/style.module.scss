@@ -1,10 +1,10 @@
 .chats {
   background-color: #282630;
   color: white;
-  width: 300px;
+  max-width: 300px;
   padding: 12px;
   transition: width 0.3s;
-  flex-shrink: 0;
+  flex: 1 1 auto;
 
   .item {
     transition: transform 0.3s;
@@ -43,12 +43,13 @@
   .actions {
     display: flex;
     gap: 12px;
-    padding-left: 20px;
 
-    &Second {
+    &Main {
       display: flex;
       gap: 12px;
       overflow: hidden;
+      justify-content: space-between;
+      width: 100%;
     }
 
     &Toggle {
@@ -61,6 +62,22 @@
       }
 
       flex-shrink: 0;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .chats {
+    width: auto;
+    height: 44px;
+    // TODO
+    overflow: hidden;
+    max-width: 100%;
+
+    .actions {
+      &Toggle {
+        display: none;
+      }
     }
   }
 }

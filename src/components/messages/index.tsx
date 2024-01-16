@@ -15,6 +15,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { appPath } from "@/pages/urls";
 import cx from "classnames";
 import BgPattern from "@/assets/pattern.svg";
+import { useView } from "@/helpers/hooks";
 
 const { Text } = Typography;
 
@@ -40,6 +41,7 @@ export const Messages = () => {
   const activeUser = useAppSelector((state) => state.users.activeUser);
   const refUser = useRef(activeUser);
   const { chatId } = useParams();
+  const { isMobile } = useView();
 
   useEffect(() => {
     refUser.current = activeUser;
@@ -84,8 +86,6 @@ export const Messages = () => {
         to: chatId,
       };
 
-      // console.log(checkChat(chatMsgId, activeUser.name, chatId));
-
       stateToServiceWorker({
         data: message,
         type: "send-msg",
@@ -112,6 +112,8 @@ export const Messages = () => {
       scrollToBottomList();
     }
   }, [chatId]);
+
+  if (isMobile && !chatId) return null;
 
   if (!chatId)
     return (
